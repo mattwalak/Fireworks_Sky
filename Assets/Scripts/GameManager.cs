@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
         fwk.Launch(new Vector2(random_x, random_y));
     }
 
-    public void NetworkLaunch(int shape, float hue){
+    public void NetworkLaunch(int shape, Color color){
         FireworkBody fwk = Instantiate(fireworkPrefab).GetComponent<FireworkBody>();
 
         float random_x = Random.Range(
@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
 
         fwk.numParticles = Random.Range(5, 10)*2 + 1;
         fwk.particleShape = (ParticleShape)shape;
-        fwk.particleColor = Color.HSVToRGB(hue, 1f, 0.8f);
+        fwk.particleColor = color; /*Color.HSVToRGB(hue, 1f, 0.8f);*/
 
         fwk.Launch(new Vector2(random_x, random_y));
 

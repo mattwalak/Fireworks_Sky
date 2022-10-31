@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum ParticleShape{
+    TRIANGLE = 0,
     SQUARE = 1,
-    TRIANGLE = 2,
-    CIRCLE = 3
+    CIRCLE = 2
 }
 
 public class FireworkBody : MonoBehaviour

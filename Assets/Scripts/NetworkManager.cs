@@ -11,7 +11,7 @@ public class NetworkManager : MonoBehaviour
 
     public static bool DEBUG = false;
     
-    string host = "ws://54.147.44.11:42742";
+    string host = "ws://52.73.235.243:42742";
     WebSocket ws;
 
     List<Action<NetworkMessage>> handlers;
@@ -51,7 +51,7 @@ public class NetworkManager : MonoBehaviour
 
     public void HandleDeliverFirework(NetworkMessage msgObj){
         Debug.Log("Deliver Firework handler");
-        gameManager.NetworkLaunch(msgObj.particleShape, msgObj.particleHue);
+        gameManager.NetworkLaunch(msgObj.particleShape, msgObj.particleColor);
     }
 
     // ----------------------------------- UNITY STUFF -----------------------------

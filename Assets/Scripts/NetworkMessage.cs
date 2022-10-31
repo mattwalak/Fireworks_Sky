@@ -31,7 +31,7 @@ public class NetworkMessage
 
     // Used with Server:DeliverFirework
     public int particleShape;
-    public float particleHue;
+    public Color particleColor;
 
     public string Serialized(){
         return JsonUtility.ToJson(this);

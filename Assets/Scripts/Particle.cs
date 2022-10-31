@@ -24,14 +24,14 @@ public class Particle : MonoBehaviour
         color = color_in;
 
         switch(shape){
-            case ParticleShape.CIRCLE:
-                renderer.sprite = CircleSprite;
+            case ParticleShape.TRIANGLE:
+                renderer.sprite = TriangleSprite;
                 break;
             case ParticleShape.SQUARE:
                 renderer.sprite = SquareSprite;
                 break;
-            case ParticleShape.TRIANGLE:
-                renderer.sprite = TriangleSprite;
+            case ParticleShape.CIRCLE:
+                renderer.sprite = CircleSprite;
                 break;
         }
 
