@@ -6,6 +6,10 @@ public class GameManager : MonoBehaviour
 {
     public NetworkManager netManager;
     public GameObject fireworkPrefab;
+    public OSC osc;
+    public GameObject demoHighExplosionPrefab;
+    public GameObject demoMidExplosionPrefab;
+    public GameObject demoLowExplosionPrefab;
 
     private float screenHeight;
     private float screenWidth;
@@ -71,5 +75,17 @@ public class GameManager : MonoBehaviour
         fwk.Launch(new Vector2(random_x, random_y));
 
         Debug.Log("End of network launch");
+    }
+
+    public void DemoHigh(){
+        Instantiate(demoHighExplosionPrefab);
+    }
+
+    public void DemoMid(){
+        Instantiate(demoMidExplosionPrefab);
+    }
+
+    public void DemoLow(){
+        Instantiate(demoLowExplosionPrefab);
     }
 }
