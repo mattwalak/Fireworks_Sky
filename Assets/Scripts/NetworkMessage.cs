@@ -29,11 +29,48 @@ public class NetworkMessage
     // Used with Sky:OpenNewSky
     public float skyAspect;
 
+    // FWK DATA
     // Used with Server:DeliverFirework
-    public int particleShape;
-    public Color particleColor;
+    public int type; // [0, 1, 2]
+    public int shape; // [0-9]
+    public float hue; // [0, 1]
+    public float scale; // [0, 1]
+    public float normPosX; // [0, 1]
+    public float normPosY; // [0, 1]
 
     public string Serialized(){
         return JsonUtility.ToJson(this);
+    }
+
+    public FwkData ToFwkData(){
+        FwkData data = new FwkData();
+        data.type = type;
+        data.shape = shape;
+        data.hue = hue;
+        data.scale = scale;
+        data.normPosX = normPosX;
+        data.normPosY = normPosY;
+
+        return data;
+    }
+}
+
+public class FwkData{
+    public int type; // [1, 2, 3]
+    public int shape; // [0-9]
+    public float hue; // [0, 1]
+    public float scale; // [0, 1]
+    public float normPosX; // [0, 1]
+    public float normPosY; // [0, 1]
+
+    public string ToString(){
+        string result = "";
+        result += "type = " + type + "; ";
+        result += "shape = " + shape + "; ";
+        result += "hue = " + hue + "; ";
+        result += "scale = " + scale + "; ";
+        result += "normPosX = " + normPosX + "; ";
+        result += "normPosY = " + normPosY + "; ";
+        return result;
     }
 }

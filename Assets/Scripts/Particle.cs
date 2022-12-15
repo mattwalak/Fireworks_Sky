@@ -4,18 +4,25 @@ using UnityEngine;
 
 public class Particle : MonoBehaviour
 {
+    public Sprite SquareSprite;
     public Sprite CircleSprite;
     public Sprite TriangleSprite;
-    public Sprite SquareSprite;
+    public Sprite BlobSprite;
+    public Sprite LightningSprite;
+    public Sprite CloverSprite;
+    public Sprite SpikeSprite;
+    public Sprite StarSprite;
+    public Sprite HeartSprite;
+    public Sprite CrescentSprite;
 
-    private ParticleShape shape;
+    private int shape;
     private Color color;
 
     private SpriteRenderer renderer;
     private Rigidbody2D body;
 
 
-    public void Init(ParticleShape shape_in, Color color_in){
+    public void Init(int shape_in, Color color_in){
         renderer = GetComponent<SpriteRenderer>();
         body = GetComponent<Rigidbody2D>();
         renderer.enabled = true;
@@ -24,14 +31,35 @@ public class Particle : MonoBehaviour
         color = color_in;
 
         switch(shape){
-            case ParticleShape.TRIANGLE:
-                renderer.sprite = TriangleSprite;
-                break;
-            case ParticleShape.SQUARE:
+            case 0:
                 renderer.sprite = SquareSprite;
                 break;
-            case ParticleShape.CIRCLE:
+            case 1:
                 renderer.sprite = CircleSprite;
+                break;
+            case 2:
+                renderer.sprite = TriangleSprite;
+                break;
+            case 3:
+                renderer.sprite = BlobSprite;
+                break;
+            case 4:
+                renderer.sprite = LightningSprite;
+                break;
+            case 5:
+                renderer.sprite = CloverSprite;
+                break;
+            case 6:
+                renderer.sprite = SpikeSprite;
+                break;
+            case 7:
+                renderer.sprite = StarSprite;
+                break;
+            case 8:
+                renderer.sprite = HeartSprite;
+                break;
+            case 9:
+                renderer.sprite = CrescentSprite;
                 break;
         }
 
@@ -40,6 +68,14 @@ public class Particle : MonoBehaviour
 
     public void SetPosition(Vector2 pos){
         transform.position = pos;
+    }
+
+    public void SetRotation(float rot){
+        transform.eulerAngles = new Vector3(
+            transform.eulerAngles.x,
+            transform.eulerAngles.y,
+            rot
+        );
     }
 
     public void SetLocalPosition(Vector2 localPos){
@@ -68,6 +104,16 @@ public class Particle : MonoBehaviour
 
     public void SetAngularVelocity(float vel){
         body.angularVelocity = vel;
+    }
+
+    public void SetAlpha(float val){
+        Color col = renderer.material.color;
+        col = new Color(col.r, col.g, col.b, val);
+        renderer.material.color = col;
+    }
+
+    public GameObject GetGameObject(){
+        return gameObject;
     }
 
     public void SetFadeout(float untilFadeout, float duringFadeout){

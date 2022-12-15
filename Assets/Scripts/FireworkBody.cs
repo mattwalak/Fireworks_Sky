@@ -2,18 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ParticleShape{
-    TRIANGLE = 0,
-    SQUARE = 1,
-    CIRCLE = 2
-}
-
 public class FireworkBody : MonoBehaviour
 {
     public GameObject particlePrefab;
 
     public int numParticles;
-    public ParticleShape particleShape;
+    public int particleShape;
     public Color particleColor;
 
     private float screenHeight;
@@ -27,6 +21,11 @@ public class FireworkBody : MonoBehaviour
     private bool isExploding = false;
 
     private SpriteRenderer renderer;
+    private OSC osc;
+
+    private void Start(){
+        osc = (OSC) FindObjectOfType<OSC>();
+    }
 
     public void Launch(Vector2 explodePosition){
         renderer = GetComponent<SpriteRenderer>();
@@ -64,7 +63,15 @@ public class FireworkBody : MonoBehaviour
             p.SetFadeout(1f * Random.Range(.8f, 1.2f), 1f*Random.Range(.8f, 1.2f));
         }
 
+        PlaySound();
         Destroy(gameObject);
+    }
+
+    private void PlaySound(){
+        OscMessage msg = new OscMessage();
+        msg.address = "/melodyNote";
+        msg.values.Add(0.5f);
+        osc.Send(msg);
     }
 
     private void Update(){
