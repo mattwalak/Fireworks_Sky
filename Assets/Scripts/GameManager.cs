@@ -28,6 +28,12 @@ public class GameManager : MonoBehaviour
         screenWidth = screenHeight * Camera.main.aspect;
     }
 
+    public void DebugOSC(){
+        OscMessage msg = new OscMessage();
+        msg.address = "/pants";
+        osc.Send(msg);
+    }
+
     public void OnOpenNewSkyClicked(){
         netManager.EstablishConnection();
 
