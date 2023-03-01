@@ -15,7 +15,7 @@ public class NoiseGameManager : MonoBehaviour
     private Camera mainCamera;
 
     private const int NUM_PARTICLES_PER_CLICK = 25;
-    private const float TIME_BETWEEN_BLASTS = 0.5f;
+    private const float TIME_BETWEEN_BLASTS = 0.1f;
     private const float ROTATION_PERIOD = 500.0f;
 
     private float blastCounter_t = 0f;
