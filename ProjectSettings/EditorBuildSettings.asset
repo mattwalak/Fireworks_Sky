@@ -8,7 +8,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/StoneControlPanel.unity
     guid: a2b4af554030aeb4cbe78054a18f4fe1
+  - enabled: 1
+    path: Assets/Scenes/PlayerConnectionScene.unity
+    guid: ef499b911702949b39d4e07f183e448f
+  - enabled: 1
+    path: Assets/Scenes/Circles_Game.unity
+    guid: 06de116d3cc13004ab41ed540fc3f2db
   m_configObjects: {}

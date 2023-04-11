@@ -6,8 +6,13 @@ using System;
 
 public class NetworkManager : MonoBehaviour
 {
+    public bool isPlayerConnectionScene;
+    public bool isGameScene;
+
     public Log log;
     public GameManager gameManager;
+    public PlayerConnectionManager playerConnectionManager;
+    public NoiseGameManager noiseGameManager;
 
     public static bool DEBUG = false;
     
@@ -33,6 +38,10 @@ public class NetworkManager : MonoBehaviour
                         handlers.Add(HandleDeliverFirework);
                         messages.Add(msgObj);
                         break;
+                    case "PlayerInputData":
+                        handlers.Add(HandlePlayerInputData);
+                        messages.Add(msgObj);
+                        break;
                     default:
                         Debug.Log("ERROR - Unknown command");
                         break;
@@ -54,6 +63,16 @@ public class NetworkManager : MonoBehaviour
         gameManager.NetworkLaunch(msgObj.ToFwkData());
     }
 
+    public void HandlePlayerInputData(NetworkMessage msgObj){
+        Debug.Log("Player Input Data handler");
+        if(isPlayerConnectionScene){
+            playerConnectionManager.HandlePlayerInputData(msgObj);
+        }else if(isGameScene){
+
+        }
+        
+    }
+
     // ----------------------------------- UNITY STUFF -----------------------------
 
     private void Start()
@@ -61,9 +80,9 @@ public class NetworkManager : MonoBehaviour
         if (Application.isEditor)
         {
             DEBUG = true;
-            log.Add("Running in DEBUG");
+            Debug.Log("Running in DEBUG");
         }else{
-            log.Add("for real this time");
+            Debug.Log("for real this time");
         }
 
         if(DEBUG){

@@ -39,6 +39,11 @@ public class AirParticle : MonoBehaviour
         spriteRenderer.color = col;
     }
 
+    public float GetGain(){
+        float frac = t / expirationTime;
+        return 1 - frac;
+    }
+
     void Update(){
         if(transform.position.x < -screenWidth || transform.position.x > screenWidth
             || transform.position.y < -screenHeight || transform.position.y > screenHeight){

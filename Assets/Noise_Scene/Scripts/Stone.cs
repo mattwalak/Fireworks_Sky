@@ -37,6 +37,7 @@ public class Stone : MonoBehaviour
         OscMessage msg = new OscMessage();
         msg.address = "/playStoneNote";
         msg.values.Add(stoneNum);
+        msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
         osc.Send(msg);
 
         /*

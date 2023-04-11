@@ -14,8 +14,8 @@ public class NoiseGameManager : MonoBehaviour
     private GameObject activeWindTouchObject;
     private Camera mainCamera;
 
-    private const int NUM_PARTICLES_PER_CLICK = 25;
-    private const float TIME_BETWEEN_BLASTS = 0.1f;
+    private const int NUM_PARTICLES_PER_CLICK = 10;
+    private const float TIME_BETWEEN_BLASTS = 0.15f;
     private const float ROTATION_PERIOD = 500.0f;
 
     private float blastCounter_t = 0f;
@@ -71,7 +71,7 @@ public class NoiseGameManager : MonoBehaviour
         }
 
         while(blastCounter_t > TIME_BETWEEN_BLASTS){
-            blastParticles();
+            // blastParticles();
             blastCounter_t -= TIME_BETWEEN_BLASTS;
         }
 
@@ -129,4 +129,6 @@ public class NoiseGameManager : MonoBehaviour
         Debug.Log("Max score = " + maxHitScore);
         Debug.Log("Min score = " + minHitScore);*/
     }
+
+    public void ReceivePlayerInput(NetworkMessage msg)
 }

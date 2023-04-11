@@ -38,6 +38,11 @@ public class NetworkMessage
     public float normPosX; // [0, 1]
     public float normPosY; // [0, 1]
 
+    // PLAYER INPUT
+    public int playerNumber; // 1 or 2
+    public int updatedConnection; // 1 = found player, -1 = lost player
+    public int newPlayerConnected;
+
     public string Serialized(){
         return JsonUtility.ToJson(this);
     }
@@ -51,6 +56,18 @@ public class NetworkMessage
         data.normPosX = normPosX;
         data.normPosY = normPosY;
 
+        return data;
+    }
+
+    // I'm gonna be honest, not sure if this is neccesary
+    // seems like you should just pass along the whole
+    // network object? Gonna roll with that and come back
+    // here if neccesary.
+    public PlayerInputData ToPlayerInputData(){
+        PlayerInputData data = new PlayerInputData();
+        /*data.playerNumber = playerNumber;
+        data.updatedConnection = updatedConnection;
+        */
         return data;
     }
 }
@@ -71,6 +88,18 @@ public class FwkData{
         result += "scale = " + scale + "; ";
         result += "normPosX = " + normPosX + "; ";
         result += "normPosY = " + normPosY + "; ";
+        return result;
+    }
+}
+
+public class PlayerInputData{
+    public int playerNumber; // 1 or 2
+    public int updatedConnection; // 1 or -1
+
+    public string ToString(){
+        string result = "";
+        result += "playerNumber = " + playerNumber + "; ";
+        result += "updatedConnection = " + updatedConnection + "; ";
         return result;
     }
 }
