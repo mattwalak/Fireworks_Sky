@@ -7,12 +7,22 @@ public class NoiseGameManager : MonoBehaviour
     public float scaleAdditionValue = 0.01f;
 
     public GameObject laserCollection;
+    public StonePlacer stonePlacer;
+    public CircleBounds circleBounds;
 
     public GameObject airParticlePrefab;
     public GameObject windTouchGameObject;
 
+    private NetworkManager netManager;
+
     private GameObject activeWindTouchObject;
     private Camera mainCamera;
+
+    // 0 = impulse mode
+    // [1, 2) = rhythmic impulse mode
+    // 2 = laser mode
+
+    private int gameState = 0;
 
     private const int NUM_PARTICLES_PER_CLICK = 10;
     private const float TIME_BETWEEN_BLASTS = 0.15f;
@@ -32,6 +42,11 @@ public class NoiseGameManager : MonoBehaviour
         mainCamera = Camera.main;
         activeWindTouchObject = Instantiate(windTouchGameObject, transform);
         activeWindTouchObject.SetActive(false);
+
+        netManager = (NetworkManager) FindObjectOfType(typeof(NetworkManager));
+        if(netManager != null){
+            netManager.LoadNoiseGameScene();
+        }
     }
 
     public void AddStone(Stone stone){
@@ -42,11 +57,8 @@ public class NoiseGameManager : MonoBehaviour
         stones.Add(stone);
     }
 
-    void blastParticles(){
+    void blastParticlesAtLocation(Vector2 pos){
         float rotationFrac = rotationTimer_t / ROTATION_PERIOD;
-        Vector2 mousePos = Input.mousePosition;
-        Vector2 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
-
         for(int i = 0; i < NUM_PARTICLES_PER_CLICK; i++){
             float rad = i * (2f * Mathf.PI / NUM_PARTICLES_PER_CLICK) /*+ (2f * Mathf.PI * rotationFrac)*/;
             Vector2 dir = new Vector2(
@@ -55,10 +67,16 @@ public class NoiseGameManager : MonoBehaviour
             );
                 
             GameObject p = Instantiate(airParticlePrefab, transform);
-            p.transform.position = worldPos;
+            p.transform.position = pos;
             Rigidbody2D p2d = p.GetComponent<Rigidbody2D>();
             p2d.velocity = dir * 4;
         }    
+    }
+
+    void blastParticlesAtMouseLocation(){
+        Vector2 mousePos = Input.mousePosition;
+        Vector2 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+        blastParticlesAtLocation(worldPos);
     }
 
     void Update(){
@@ -71,12 +89,12 @@ public class NoiseGameManager : MonoBehaviour
         }
 
         while(blastCounter_t > TIME_BETWEEN_BLASTS){
-            // blastParticles();
+            // blastParticlesAtMouseLocation();
             blastCounter_t -= TIME_BETWEEN_BLASTS;
         }
 
         if(Input.GetMouseButtonDown(0)){
-            // blastParticles();
+            blastParticlesAtMouseLocation();
         }
 
         Vector2 mousePos = Input.mousePosition;
@@ -130,5 +148,25 @@ public class NoiseGameManager : MonoBehaviour
         Debug.Log("Min score = " + minHitScore);*/
     }
 
-    public void ReceivePlayerInput(NetworkMessage msg)
+    public void ReceivePlayerInput(NetworkMessage msg){
+        
+    }
+
+    public void HandleCircleButtonClick(NetworkMessage msg){
+        Debug.Log("Toggling glow mode for circle = " + msg.circleButtonID);
+        if(msg.circleButtonState == -1){
+            stonePlacer.stoneScripts[msg.circleButtonID].DisableGlowState();
+        }else{
+            stonePlacer.stoneScripts[msg.circleButtonID].EnableGlowState();
+        }
+    }
+
+    public void HandleSendTouchPositionData(NetworkMessage msg){
+        if(gameState == 0){
+            if(msg.touchState == 1){
+                Vector2 pos = new Vector2(msg.touchPosX, msg.touchPosY);
+                blastParticlesAtLocation(pos * circleBounds.radius);
+            }
+        }
+    }
 }

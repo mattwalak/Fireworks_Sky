@@ -5,14 +5,26 @@ using UnityEngine;
 public class Stone : MonoBehaviour
 {
     public int stoneNum;
-    public OSC osc;
+    private OSC osc;
 
     private NoiseGameManager gameManager;
+    private SpriteRenderer spriteRenderer;
     private float hitScore;
     private const float HIT_DECAY_PER_SEC = 1;
 
     private const float MIN_HIT_SCORE = 0;
     private const float MAX_HIT_SCORE = 10;
+
+    public StoneGlow glow;
+
+    private Color normalColor = new Color(82.0f/255.0f, 82.0f/255.0f, 82.0f/255.0f, 1.0f);
+    private Color glowColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+    private Color lockedColor = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+
+    private bool isInGlowState = false;
+    private bool isInColoredState = false;
+    private int numGlowHits = 0;
+
 
     public float GetHitScore(){
         return hitScore;
@@ -20,7 +32,9 @@ public class Stone : MonoBehaviour
 
     void Start(){
         gameManager = (NoiseGameManager)FindObjectOfType<NoiseGameManager>();
+        osc = (OSC)FindObjectOfType<OSC>();
         gameManager.AddStone(this);
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update(){
@@ -32,13 +46,54 @@ public class Stone : MonoBehaviour
         hitScore = Mathf.Clamp(hitScore, MIN_HIT_SCORE, MAX_HIT_SCORE);
     }
 
+    private void UpdateColor(){
+        float hue = (120.0f + numGlowHits * 60.0f) % 360.0f;
+        Debug.Log("hue = " + hue);
+        Color col = Color.HSVToRGB(hue/360.0f, 1.0f, 0.8f);
+        spriteRenderer.color = col;
+        glow.SetColor(col);
+    }    
+
+    public void EnableGlowState(){
+        isInGlowState = true;
+        glow.gameObject.SetActive(true);
+    }
+
+    public void DisableGlowState(){
+        isInGlowState = false;
+        glow.gameObject.SetActive(false);
+    }
+
     void OnCollisionEnter2D(Collision2D collisionInfo)
     {
-        OscMessage msg = new OscMessage();
-        msg.address = "/playStoneNote";
-        msg.values.Add(stoneNum);
-        msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
-        osc.Send(msg);
+        if(isInGlowState){
+            OscMessage msg = new OscMessage();
+            msg.address = "/playStoneNoteGlowHit";
+            msg.values.Add(stoneNum);
+            msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
+            osc.Send(msg);
+
+            numGlowHits++;
+            UpdateColor();
+
+            isInColoredState = true;
+        }else if(isInColoredState){
+            OscMessage msg = new OscMessage();
+            msg.address = "/playStoneNoteColoredHit";
+            msg.values.Add(stoneNum);
+            msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
+            msg.values.Add(numGlowHits % 6);
+            osc.Send(msg);
+
+            numGlowHits++;
+            UpdateColor();
+        }else{
+            OscMessage msg = new OscMessage();
+            msg.address = "/playStoneNote";
+            msg.values.Add(stoneNum);
+            msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
+            osc.Send(msg);
+        }
 
         /*
         transform.localScale = new Vector2(

@@ -1077,9 +1077,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d4eef594c11ae44a99ad0fc0d32273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayerConnectionScene: 1
+  isNoiseGameScene: 0
   log: {fileID: 0}
   gameManager: {fileID: 0}
   playerConnectionManager: {fileID: 78676604}
+  noiseGameManager: {fileID: 0}
 --- !u!4 &1092610250
 Transform:
   m_ObjectHideFlags: 0

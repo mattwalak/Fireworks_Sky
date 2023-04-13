@@ -20,6 +20,10 @@ public class PlayerConnectionManager : MonoBehaviour
     private bool hasPlayer1 = false;
     private bool hasPlayer2 = false;
 
+    void Start(){
+        DontDestroyOnLoad(netManager);
+    }
+
     public void OnOpenGameClicked(){
         netManager.EstablishConnection();
 
@@ -42,6 +46,7 @@ public class PlayerConnectionManager : MonoBehaviour
     }
 
     public void HandlePlayerInputData(NetworkMessage msgObj){
+        Debug.Log("msgObj = " + msgObj);
         if(msgObj.newPlayerConnected == 1){
             player1Text.text = "Connected!";
             hasPlayer1 = true;

@@ -7,7 +7,7 @@ using System;
 public class NetworkManager : MonoBehaviour
 {
     public bool isPlayerConnectionScene;
-    public bool isGameScene;
+    public bool isNoiseGameScene;
 
     public Log log;
     public GameManager gameManager;
@@ -16,7 +16,7 @@ public class NetworkManager : MonoBehaviour
 
     public static bool DEBUG = false;
     
-    string host = "ws://3.85.104.149:42742";
+    string host = "ws://18.215.177.114:42742";
     WebSocket ws;
 
     List<Action<NetworkMessage>> handlers;
@@ -35,11 +35,22 @@ public class NetworkManager : MonoBehaviour
             }else{
                 switch(msgObj.command){
                     case "DeliverFirework":
+                        Debug.Log("DeliverFirework Initial Response");
                         handlers.Add(HandleDeliverFirework);
                         messages.Add(msgObj);
                         break;
                     case "PlayerInputData":
+                        Debug.Log("PlayerInputData Initial Response");
                         handlers.Add(HandlePlayerInputData);
+                        messages.Add(msgObj);
+                        break;
+                    case "CircleButtonClick":
+                        Debug.Log("CircleButtonClick Initial Response");
+                        handlers.Add(HandleCircleButtonClick);
+                        messages.Add(msgObj);
+                        break;
+                    case "SendTouchPositionData":
+                        handlers.Add(HandleSendTouchPositionData);
                         messages.Add(msgObj);
                         break;
                     default:
@@ -57,6 +68,19 @@ public class NetworkManager : MonoBehaviour
     }
     
     // ---------------------------------- HANDLERS --------------------------------
+    public void HandleSendTouchPositionData(NetworkMessage msgObj){
+        if(isNoiseGameScene){
+            noiseGameManager.HandleSendTouchPositionData(msgObj);
+        }
+    }
+    
+    public void HandleCircleButtonClick(NetworkMessage msgObj){
+        Debug.Log("Circle Button Click handler");
+        if(isNoiseGameScene){
+            noiseGameManager.HandleCircleButtonClick(msgObj);
+        }
+    }
+
 
     public void HandleDeliverFirework(NetworkMessage msgObj){
         Debug.Log("Deliver Firework handler");
@@ -67,7 +91,7 @@ public class NetworkManager : MonoBehaviour
         Debug.Log("Player Input Data handler");
         if(isPlayerConnectionScene){
             playerConnectionManager.HandlePlayerInputData(msgObj);
-        }else if(isGameScene){
+        }else if(isNoiseGameScene){
 
         }
         
@@ -91,6 +115,13 @@ public class NetworkManager : MonoBehaviour
 
         handlers = new List<Action<NetworkMessage>>();
         messages = new List<NetworkMessage>();
+    }
+
+    public void LoadNoiseGameScene(){
+        isPlayerConnectionScene = false;
+        isNoiseGameScene = true;
+
+        noiseGameManager = (NoiseGameManager) FindObjectOfType(typeof(NoiseGameManager));
     }
 
     private void Update(){
