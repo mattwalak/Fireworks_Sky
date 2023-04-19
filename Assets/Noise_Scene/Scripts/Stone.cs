@@ -8,6 +8,7 @@ public class Stone : MonoBehaviour
     private OSC osc;
 
     private NoiseGameManager gameManager;
+    private NetworkManager netManager;
     private SpriteRenderer spriteRenderer;
     private float hitScore;
     private const float HIT_DECAY_PER_SEC = 1;
@@ -32,6 +33,7 @@ public class Stone : MonoBehaviour
 
     void Start(){
         gameManager = (NoiseGameManager)FindObjectOfType<NoiseGameManager>();
+        netManager = (NetworkManager)FindObjectOfType<NetworkManager>();
         osc = (OSC)FindObjectOfType<OSC>();
         gameManager.AddStone(this);
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -73,6 +75,16 @@ public class Stone : MonoBehaviour
             msg.values.Add(collisionInfo.gameObject.GetComponent<AirParticle>().GetGain());
             osc.Send(msg);
 
+            if(numGlowHits == 0){
+                // First glow hit
+                gameManager.RegisterNewActivatedStone();
+                NetworkMessage netMsgObj = new NetworkMessage();
+                netMsgObj.circleButtonID = stoneNum;
+                netMsgObj.circleButtonState = 2;
+                netMsgObj.source = "Game";
+                netMsgObj.command = "SendCircleButtonUpdateFromGame";
+                netManager.SendMessage(netMsgObj);
+            }
             numGlowHits++;
             UpdateColor();
 

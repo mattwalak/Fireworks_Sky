@@ -1,10 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class NoiseGameManager : MonoBehaviour
 {
     public float scaleAdditionValue = 0.01f;
+
+    public TMP_Text circlesCounter;
+    private int circlesLeft = 20;
 
     public GameObject laserCollection;
     public StonePlacer stonePlacer;
@@ -119,7 +124,13 @@ public class NoiseGameManager : MonoBehaviour
         ManageStones();
     }
 
-
+    public void RegisterNewActivatedStone(){
+        circlesLeft--;
+        circlesCounter.text = circlesLeft.ToString();
+        if(circlesLeft == 0){
+            // Activate next stage
+        }
+    }
 
     private void ManageStones(){
         if(stones == null || stones.Count == 0){
