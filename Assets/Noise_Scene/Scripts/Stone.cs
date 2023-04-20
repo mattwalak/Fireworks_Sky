@@ -18,9 +18,10 @@ public class Stone : MonoBehaviour
 
     public StoneGlow glow;
 
-    private Color normalColor = new Color(82.0f/255.0f, 82.0f/255.0f, 82.0f/255.0f, 1.0f);
+    private Color normalColor = new Color(160.0f/255.0f, 160.0f/255.0f, 160.0f/255.0f, 1.0f);
     private Color glowColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
     private Color lockedColor = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+
 
     private bool isInGlowState = false;
     private bool isInColoredState = false;
@@ -37,6 +38,11 @@ public class Stone : MonoBehaviour
         osc = (OSC)FindObjectOfType<OSC>();
         gameManager.AddStone(this);
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        UpdateColor();
+
+        // DEBUG
+        EnableGlowState();
     }
 
     void Update(){
@@ -48,12 +54,24 @@ public class Stone : MonoBehaviour
         hitScore = Mathf.Clamp(hitScore, MIN_HIT_SCORE, MAX_HIT_SCORE);
     }
 
+    public void ResetForNewGameState(int newGameState){
+        if(newGameState == 1){
+            DisableGlowState();
+            isInColoredState = false;
+            numGlowHits = 0;
+            UpdateColor();
+        }
+    }
+
     private void UpdateColor(){
-        float hue = (120.0f + numGlowHits * 60.0f) % 360.0f;
-        Debug.Log("hue = " + hue);
-        Color col = Color.HSVToRGB(hue/360.0f, 1.0f, 0.8f);
-        spriteRenderer.color = col;
-        glow.SetColor(col);
+        if(numGlowHits != 0){
+            float hue = (120.0f + numGlowHits * 60.0f) % 360.0f;
+            Color col = Color.HSVToRGB(hue/360.0f, 1.0f, 0.8f);
+            spriteRenderer.color = col;
+            glow.SetColor(col);
+        }else{
+            spriteRenderer.color = normalColor;
+        }
     }    
 
     public void EnableGlowState(){
@@ -85,6 +103,7 @@ public class Stone : MonoBehaviour
                 netMsgObj.command = "SendCircleButtonUpdateFromGame";
                 netManager.SendMessage(netMsgObj);
             }
+
             numGlowHits++;
             UpdateColor();
 

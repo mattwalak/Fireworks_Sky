@@ -53,6 +53,10 @@ public class NetworkManager : MonoBehaviour
                         handlers.Add(HandleSendTouchPositionData);
                         messages.Add(msgObj);
                         break;
+                    case "SendKeyChange":
+                        handlers.Add(HandleSendKeyChange);
+                        messages.Add(msgObj);
+                        break;
                     default:
                         Debug.Log("ERROR - Unknown command");
                         break;
@@ -68,6 +72,12 @@ public class NetworkManager : MonoBehaviour
     }
     
     // ---------------------------------- HANDLERS --------------------------------
+    public void HandleSendKeyChange(NetworkMessage msgObj){
+        if(isNoiseGameScene){
+            noiseGameManager.HandleKeyChange(msgObj);
+        }
+    }
+    
     public void HandleSendTouchPositionData(NetworkMessage msgObj){
         if(isNoiseGameScene){
             noiseGameManager.HandleSendTouchPositionData(msgObj);

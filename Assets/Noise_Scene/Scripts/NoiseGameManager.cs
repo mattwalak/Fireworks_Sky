@@ -8,9 +8,12 @@ public class NoiseGameManager : MonoBehaviour
 {
     public float scaleAdditionValue = 0.01f;
 
+    public Vector2 ballSourcePosition;
+
     public TMP_Text circlesCounter;
     private int circlesLeft = 20;
 
+    public OSC osc;
     public GameObject laserCollection;
     public StonePlacer stonePlacer;
     public CircleBounds circleBounds;
@@ -30,7 +33,13 @@ public class NoiseGameManager : MonoBehaviour
     private int gameState = 0;
 
     private const int NUM_PARTICLES_PER_CLICK = 10;
-    private const float TIME_BETWEEN_BLASTS = 0.15f;
+    private const float TIME_BETWEEN_BLASTS = 0.5f;//0.15f;
+
+    private const float TIME_BETWEEN_BLASTS_MAX = 0.5f;
+    private const float TIME_BETWEEN_BLASTS_MIN = 0.03f;
+    private const float BALL_BLAST_VELOCITY_MIN = 3f;
+    private const float BALL_BLAST_VELOCITY_MAX = 8f;
+
     private const float ROTATION_PERIOD = 500.0f;
 
     private float blastCounter_t = 0f;
@@ -52,6 +61,8 @@ public class NoiseGameManager : MonoBehaviour
         if(netManager != null){
             netManager.LoadNoiseGameScene();
         }
+
+        ballSourcePosition = new Vector2(0, 0);
     }
 
     public void AddStone(Stone stone){
@@ -74,7 +85,7 @@ public class NoiseGameManager : MonoBehaviour
             GameObject p = Instantiate(airParticlePrefab, transform);
             p.transform.position = pos;
             Rigidbody2D p2d = p.GetComponent<Rigidbody2D>();
-            p2d.velocity = dir * 4;
+            p2d.velocity = dir * BALL_BLAST_VELOCITY_MIN;
         }    
     }
 
@@ -92,19 +103,40 @@ public class NoiseGameManager : MonoBehaviour
         while(rotationTimer_t > ROTATION_PERIOD){
             rotationTimer_t -= ROTATION_PERIOD;
         }
+        
+        if(gameState == 0){
+            // Impulse mode
+            if(Input.GetMouseButtonDown(0)){
+                blastParticlesAtMouseLocation();
+            }
 
-        while(blastCounter_t > TIME_BETWEEN_BLASTS){
-            // blastParticlesAtMouseLocation();
-            blastCounter_t -= TIME_BETWEEN_BLASTS;
+        }else if(gameState == 1){
+            // Rhythm mode
+            if(Input.GetMouseButton(0)){
+                Vector2 mousePos = Input.mousePosition;
+                Vector2 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+                ballSourcePosition = worldPos;
+            }
+
+            while(blastCounter_t > TIME_BETWEEN_BLASTS){
+                blastParticlesAtLocation(ballSourcePosition);
+                blastCounter_t -= TIME_BETWEEN_BLASTS;
+            }
+        }else if(gameState == 2){
+            // Laser mode
+            if(Input.GetMouseButton(0)){
+                Vector2 mousePos = Input.mousePosition;
+                Vector2 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+                ballSourcePosition = worldPos;
+            }
+
+            laserCollection.transform.position = ballSourcePosition;
         }
 
-        if(Input.GetMouseButtonDown(0)){
-            blastParticlesAtMouseLocation();
-        }
 
-        Vector2 mousePos = Input.mousePosition;
-        Vector2 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
-        laserCollection.transform.position = worldPos;
+        
+
+        
 
 
         /*
@@ -128,7 +160,19 @@ public class NoiseGameManager : MonoBehaviour
         circlesLeft--;
         circlesCounter.text = circlesLeft.ToString();
         if(circlesLeft == 0){
-            // Activate next stage
+            if(gameState == 0){
+                // SCENE CHANGE: Transition to continious impulse mode
+                gameState = 1;
+                foreach(Stone s in stonePlacer.stoneScripts){
+                    s.ResetForNewGameState(1);
+                }
+
+                NetworkMessage msg = new NetworkMessage();
+                msg.source = "Game";
+                msg.command = "SceneChange";
+                msg.changeSceneTo = 1;
+                netManager.SendMessage(msg);
+            }
         }
     }
 
@@ -178,6 +222,20 @@ public class NoiseGameManager : MonoBehaviour
                 Vector2 pos = new Vector2(msg.touchPosX, msg.touchPosY);
                 blastParticlesAtLocation(pos * circleBounds.radius);
             }
+        }else{
+            ballSourcePosition = new Vector2(msg.touchPosX, msg.touchPosY);
+            ballSourcePosition = ballSourcePosition * circleBounds.radius;
+        }
+    }
+
+    public void HandleKeyChange(NetworkMessage msg){
+        if(gameState == 1){
+            Debug.Log("New key: " + msg.newKey);
+
+            OscMessage oscMessage = new OscMessage();
+            oscMessage.address = "/keyChange";
+            oscMessage.values.Add(msg.newKey);
+            osc.Send(oscMessage);
         }
     }
 }

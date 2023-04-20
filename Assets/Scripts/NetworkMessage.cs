@@ -48,6 +48,9 @@ public class NetworkMessage
     public float touchPosX;
     public float touchPosY;
 
+    public int changeSceneTo; // 2 = change to continuous impulse mode
+    public int newKey;
+
     public string Serialized(){
         return JsonUtility.ToJson(this);
     }
